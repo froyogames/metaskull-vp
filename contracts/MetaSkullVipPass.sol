@@ -19,11 +19,10 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/security/Pausable.sol";
 import "@openzeppelin/contracts/token/ERC1155/extensions/ERC1155Supply.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
-import "hardhat/console.sol";
 import "@openzeppelin/contracts/token/ERC1155/extensions/ERC1155Burnable.sol";
 
-contract vipPass is ERC1155, Ownable, Pausable, ERC1155Supply, ERC1155Burnable {
-    uint256 public _currentSupply = 0; //Might dont need this since can get current supply from totalSupply()
+contract MetaSkullVipPass is ERC1155, Ownable, Pausable, ERC1155Supply, ERC1155Burnable {
+    uint256 public _currentSupply = 0;
     uint256 public _maxSupply = 300;
     uint256 public _mintPrice  = 0.15 ether;
     uint256 constant public _maxTokenPerOwner = 1;
@@ -33,6 +32,10 @@ contract vipPass is ERC1155, Ownable, Pausable, ERC1155Supply, ERC1155Burnable {
     bool public _publicSaleIsOpen = false;
     mapping(address => bool) public vip;
     mapping(address => bool) public minted;
+
+    event SetPublicSaleBool(bool _publicSale);
+    event Withdraw(uint256 _balance);
+    event SetMintPrice(uint256 _mintPrice);
 
     constructor() ERC1155("") {
         _name = "MetaSkull VIP Pass";
@@ -58,6 +61,7 @@ contract vipPass is ERC1155, Ownable, Pausable, ERC1155Supply, ERC1155Burnable {
 
     function setPublicSaleBool(bool publicSale) external onlyOwner {
         _publicSaleIsOpen = publicSale;
+        emit SetPublicSaleBool(publicSale);
     }
 
     function getPublicSaleBool() external view virtual onlyOwner returns (bool) {
@@ -72,16 +76,21 @@ contract vipPass is ERC1155, Ownable, Pausable, ERC1155Supply, ERC1155Burnable {
     }
 
     function withdraw() external onlyOwner{
+        uint256 balance = address(this).balance;
         require(address(this).balance > 0, "Balance is 0");
         payable(owner()).transfer(address(this).balance);
+        emit Withdraw(balance);
     }
 
     function setMaxSupply(uint256 maxSupply) external onlyOwner{
         _maxSupply = maxSupply;
     }
 
+    //Input units is in wei
+    //Example of setting mint price to 0.1ETH: setMintPrice(100000000000000000)
     function setMintPrice(uint256 mintPrice) external onlyOwner{
         _mintPrice = mintPrice;
+        emit SetMintPrice(_mintPrice);
     }
 
     //Minter Functions//
