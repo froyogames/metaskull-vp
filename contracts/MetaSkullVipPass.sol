@@ -102,7 +102,6 @@ contract MetaSkullVipPass is ERC1155, Ownable, Pausable, ERC1155Supply, ERC1155B
         if(this.balanceOf(msg.sender, 1) >= _maxTokenPerOwner) revert ("Address already owned a token");
         if(amount <= 0) revert ("Cannot mint 0 tokens");
         if(amount > _maxTokenPerOwner){
-            //Need to find out how to delete _exceedMaxMint
             string memory _exceedMaxMint = string.concat("Maximum ", Strings.toString(_maxTokenPerOwner), " mint per wallet");
             revert(_exceedMaxMint);
         }
