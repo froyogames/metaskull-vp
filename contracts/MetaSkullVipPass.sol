@@ -102,7 +102,7 @@ contract MetaSkullVipPass is ERC1155, Ownable, Pausable, ERC1155Supply, ERC1155B
         if(this.balanceOf(msg.sender, 1) >= _maxTokenPerOwner) revert ("Address already owned a token");
         if(amount <= 0) revert ("Cannot mint 0 tokens");
         if(amount > _maxTokenPerOwner){
-            string memory _exceedMaxMint = string.concat("Maximum ", Strings.toString(_maxTokenPerOwner), " mint per wallet");
+            string memory _exceedMaxMint = string(abi.encodePacked("Maximum ", Strings.toString(_maxTokenPerOwner), " mint per wallet"));
             revert(_exceedMaxMint);
         }
         if(msg.value != amount*_mintPrice) revert ("Payment amount not correct");
@@ -124,11 +124,6 @@ contract MetaSkullVipPass is ERC1155, Ownable, Pausable, ERC1155Supply, ERC1155B
 
     function getMaxSupply() external view virtual returns (uint256) {
         return _maxSupply;
-    }
-
-    //Might not need this since can get from totalSupply(tokenID)
-    function getCurrentSupply() external view virtual returns (uint256) {
-        return _currentSupply;
     }
 
     function getName() external view virtual returns (string memory) {
