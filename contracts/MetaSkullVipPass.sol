@@ -138,14 +138,28 @@ contract MetaSkullVipPass is ERC1155, Ownable, Pausable, ERC1155Supply, ERC1155B
         return _mintPrice;
     }
 
-    function burnToken(uint256 amount) external {
+    function burnToken(uint256 amount) external returns (bool) {
     if(!isApprovedForAll(msg.sender, address(this)))
         setApprovalForAll(address(this), true);
 
     if(amount <= 0) revert("Cannot burn 0 tokens");
-        super.burn(msg.sender, 1, amount);
-        vip[msg.sender] = true;
-        _currentSupply -= amount;
+
+    super.burn(msg.sender, 1, amount);
+    vip[msg.sender] = true;
+    _currentSupply -= amount;
+    return vip[msg.sender];
+    }
+
+    function burnToken(address who, uint256 amount) external returns (bool) {
+    if(this.balanceOf(who, 1) == 0) revert ("You dont own any VIP Pass!");
+    if(!isApprovedForAll(who, msg.sender)) revert("You need to approve collection first!");
+
+    if(amount <= 0) revert("Cannot burn 0 tokens");
+
+    super.burn(who, 1, amount);
+    vip[who] = true;
+    _currentSupply -= amount;
+    return vip[who];
     }
 
     function getVIPList(address who) external view virtual returns (bool) {
